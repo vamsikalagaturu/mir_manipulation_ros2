@@ -64,8 +64,10 @@
 #include <boost/units/conversion.hpp>
 
 #include <chrono>
+#include <thread>
 
 using namespace std::chrono_literals;
+using namespace std::this_thread; 
 
 int main(int argc, char * argv[])
 {
@@ -127,9 +129,20 @@ int main(int argc, char * argv[])
         //		gripperPositionPublisher->publish(command);
 
         try {
+
             command.velocities = armJointPositions;
             armPositionsPublisher->publish(command);
-
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            
+            armJointPositions[0].value =0;
+            armJointPositions[1].value =0;
+            armJointPositions[2].value =0;
+            armJointPositions[3].value =0;
+            armJointPositions[4].value =0;
+            
+            
+            command.velocities = armJointPositions;
+            armPositionsPublisher->publish(command);
             rclcpp::spin_some(node);
         } catch (const rclcpp::exceptions::RCLError & e) {
           RCLCPP_ERROR(
@@ -145,3 +158,4 @@ int main(int argc, char * argv[])
 }
 
 /* EOF */
+
